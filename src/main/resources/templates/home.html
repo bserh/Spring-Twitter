@@ -1,0 +1,17 @@
+<html>
+<head>
+    <title>Hello Twitter</title>
+</head>
+<body>
+<!--<h3>Hello, <span th:text="${twitterProfile.name}">Some User</span>!</h3>-->
+
+
+<form action="/exportTweets" method="get">
+    <label for="tweet_count">Tweets count</label><input id="tweet_count" name="number" type="number" min="1" max="200"
+                                                        value="5"/>
+
+    <button type="submit">Get Tweets</button>
+
+</form>
+</body>
+</html>

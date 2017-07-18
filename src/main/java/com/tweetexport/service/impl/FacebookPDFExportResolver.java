@@ -1,10 +1,13 @@
-package com.tweetexport.util;
+package com.tweetexport.service.impl;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import org.springframework.social.twitter.api.Tweet;
+import com.tweetexport.service.PDFExportResolver;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.social.facebook.api.Post;
+import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -12,10 +15,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class PdfGenerator {
 
-    public static ByteArrayInputStream generatePdfStream(List<Tweet> tweets) {
-
+@Service
+@Qualifier("facebookPdfResolver")
+public class FacebookPDFExportResolver implements PDFExportResolver<List<Post>> {
+    @Override
+    public ByteArrayInputStream generatePdf(List<Post> inputData) {
         Document document = new Document();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -38,17 +43,17 @@ public class PdfGenerator {
             headingCell.setHorizontalAlignment(Element.ALIGN_CENTER);
             table.addCell(headingCell);
 
-            for (Tweet tweet : tweets) {
+            for (Post post : inputData) {
 
                 PdfPCell cell;
 
-                cell = new PdfPCell(new Paragraph(tweet.getCreatedAt().toString(), contentFont));
+                cell = new PdfPCell(new Paragraph(post.getCreatedTime().toString(), contentFont));
                 cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                 cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                 table.addCell(cell);
 
 
-                cell = new PdfPCell(new Paragraph(tweet.getText(), contentFont));
+                cell = new PdfPCell(new Paragraph(post.getMessage(), contentFont));
                 cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                 cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                 table.addCell(cell);
@@ -63,7 +68,7 @@ public class PdfGenerator {
 
         } catch (DocumentException ex) {
 
-            Logger.getLogger(PdfGenerator.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FacebookPDFExportResolver.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());

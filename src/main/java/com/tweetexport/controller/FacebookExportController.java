@@ -9,7 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.social.twitter.api.Tweet;
+import org.springframework.social.facebook.api.Post;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,34 +19,34 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 
 @RestController
-public class TweetExportController {
+public class FacebookExportController {
 
-    private final SocialIntegrationService twitterService;
+    private final SocialIntegrationService facebookService;
 
-    private final PDFExportResolver twitterPdfService;
+    private final PDFExportResolver facebookPdfService;
 
     @Autowired
-    public TweetExportController(@Qualifier("twitter") SocialIntegrationService twitterService, @Qualifier("twitterPdfResolver") PDFExportResolver twitterPdfService) {
-        this.twitterService = twitterService;
-        this.twitterPdfService = twitterPdfService;
+    public FacebookExportController(@Qualifier("facebook") SocialIntegrationService facebookService, @Qualifier("facebookPdfResolver") PDFExportResolver facebookPdfService) {
+        this.facebookService = facebookService;
+        this.facebookPdfService = facebookPdfService;
     }
 
-
-    @RequestMapping(value = "/exportTweets", method = RequestMethod.GET,
+    @RequestMapping(value = "/exportPosts", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<InputStreamResource> exportTweets(@RequestParam(value = "number", defaultValue = "5") String number) {
         HttpHeaders headers = new HttpHeaders();
 
-        headers.add("Content-Disposition", "inline; filename=tweetsExport.pdf");
 
-        int tweetCount = Integer.parseInt(number);
-        List<Tweet> tweets = twitterService.exportFeed(tweetCount);
-
-        if (tweets == null) {
-            headers.add("Location", "/connect/twitter");
+        int postCount = Integer.parseInt(number);
+        List<Post> posts = facebookService.exportFeed(postCount);
+        if (posts == null) {
+            headers.add("Location", "/connect/facebook");
             return new ResponseEntity<>(null, headers, HttpStatus.FOUND);
         }
-        ByteArrayInputStream pdfStream = twitterPdfService.generatePdf(tweets);
+
+        ByteArrayInputStream pdfStream = facebookPdfService.generatePdf(posts);
+
+        headers.add("Content-Disposition", "inline; filename=postsExport.pdf");
 
         return ResponseEntity
                 .ok()

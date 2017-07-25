@@ -1,5 +1,8 @@
 package com.tweetexport.controller;
 
+import com.itextpdf.text.DocumentException;
+import com.tweetexport.exeptions.CanNotBuildPDFException;
+import com.tweetexport.exeptions.EmptyFeedExeption;
 import com.tweetexport.service.PDFExportResolver;
 import com.tweetexport.service.SocialIntegrationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +40,6 @@ public class TweetExportController {
     public ResponseEntity<InputStreamResource> exportTweets(@RequestParam(value = "number", defaultValue = "5") String number) {
         HttpHeaders headers = new HttpHeaders();
 
-        headers.add("Content-Disposition", "inline; filename=tweetsExport.pdf");
 
         int tweetCount = Integer.parseInt(number);
         List<Tweet> tweets = twitterService.exportFeed(tweetCount);
@@ -46,7 +48,20 @@ public class TweetExportController {
             headers.add("Location", "/connect/twitter");
             return new ResponseEntity<>(null, headers, HttpStatus.FOUND);
         }
-        ByteArrayInputStream pdfStream = twitterPdfService.generatePdf(tweets);
+
+        if (tweets.size() == 0) {
+            throw new EmptyFeedExeption();
+        }
+
+        ByteArrayInputStream pdfStream = null;
+        try {
+            pdfStream = twitterPdfService.generatePdf(tweets);
+
+        } catch (DocumentException e) {
+            throw new CanNotBuildPDFException();
+        }
+
+        headers.add("Content-Disposition", "inline; filename=tweetsExport.pdf");
 
         return ResponseEntity
                 .ok()

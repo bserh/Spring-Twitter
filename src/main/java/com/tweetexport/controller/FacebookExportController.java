@@ -1,5 +1,7 @@
 package com.tweetexport.controller;
 
+import com.itextpdf.text.DocumentException;
+import com.tweetexport.exeptions.CanNotBuildPDFException;
 import com.tweetexport.service.PDFExportResolver;
 import com.tweetexport.service.SocialIntegrationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +46,12 @@ public class FacebookExportController {
             return new ResponseEntity<>(null, headers, HttpStatus.FOUND);
         }
 
-        ByteArrayInputStream pdfStream = facebookPdfService.generatePdf(posts);
+        ByteArrayInputStream pdfStream = null;
+        try {
+            pdfStream = facebookPdfService.generatePdf(posts);
+        } catch (DocumentException e) {
+            throw new CanNotBuildPDFException();
+        }
 
         headers.add("Content-Disposition", "inline; filename=postsExport.pdf");
 

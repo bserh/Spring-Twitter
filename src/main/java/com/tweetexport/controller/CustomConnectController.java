@@ -19,4 +19,11 @@ public class CustomConnectController extends ConnectController {
     protected String connectedView(String providerId) {
         return "redirect:/";
     }
+
+
+    @Override
+    protected String connectView(String providerId) {
+        super.connectView(providerId);
+        return "home";
+    }
 }

@@ -1,23 +1,37 @@
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Hello Twitter</title>
 </head>
 <body>
 
-<form action="/exportTweets" method="get">
-    <label for="tweet_count">Tweets count</label><input id="tweet_count" name="number" type="number" min="1" max="200"
-                                                        value="5"/>
+<div id="twitter-export">
+    <span th:if="${social_provider_error}">Sorry, twitter service temporary unavailable</span>
+    <form action="/connect/twitter" method="POST" th:unless="${isTwitterConnected}">
+        <button type="submit">Login in twitter</button>
+    </form>
+    <form id="twitter-form" action="/exportTweets" method="get" th:if="${isTwitterConnected}">
+        <label for="tweet_count">Tweets count</label><input id="tweet_count" name="number" type="number" min="1"
+                                                            max="200"
+                                                            value="5"/>
 
-    <button type="submit">Get Tweets</button>
+        <button type="submit">Get Tweets</button>
 
-</form>
+    </form>
+</div>
 
-<form action="/exportPosts" method="get">
-    <label for="tweet_count">Posts count</label><input id="post_count" name="number" type="number" min="1" max="200"
-                                                       value="5"/>
+<div id="facebook-export">
+    <form action="/connect/facebook" method="post" th:unless="${isFacebookConnected}">
+        <button type="submit">Login in facebook</button>
 
-    <button type="submit">Get Posts</button>
+    </form>
+    <form id="facebook-form" action="/exportPosts" method="get" th:if="${isFacebookConnected}">
+        <label for="tweet_count">Posts count</label><input id="post_count" name="number" type="number" min="1" max="200"
+                                                           value="5"/>
+        <button type="submit">Get Posts</button>
 
-</form>
+    </form>
+</div>
+<script src="../static/js/jquery-3.2.1.min.js" th:src="@{js/jquery-3.2.1.min.js}"></script>
+<script src="../static/js/app.js" th:src="@{js/app.js}"></script>
 </body>
 </html>
